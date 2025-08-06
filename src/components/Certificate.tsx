@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, FileText, Shield } from "lucide-react";
 import certificateImage from "@/assets/certificate.jpg";
+import certificateImg2 from "@/assets/Certificate2.jpg";
 
 const Certificate = () => {
   const handleWhatsAppClick = () => {
@@ -27,6 +28,15 @@ const Certificate = () => {
                 <img 
                   src={certificateImage} 
                   alt="Fidelity Investments Certificate" 
+                  className="w-full h-auto object-cover"
+                />
+              </Card>
+            </div>
+            <div>
+              <Card className="overflow-hidden border-crypto-gold/20 hover:border-crypto-gold/40 transition-all duration-300">
+                <img 
+                  src={certificateImg2} 
+                  alt="Placeholder Certificate 2" 
                   className="w-full h-auto object-cover"
                 />
               </Card>

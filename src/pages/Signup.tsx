@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff } from "lucide-react";
 import fidelityLogo from "@/assets/fidelity-logo.png";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
+
+
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,17 +21,59 @@ const Signup = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeTerms: false
+    agreeTerms: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Firebase auth logic will be added here
-    console.log("Signup attempt:", formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    if (!formData.agreeTerms) {
+      alert("You must agree to the terms.");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      console.log("Signup success:", userCredential.user);
+      alert("Account created successfully!");
+
+      // Save user details to Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        isAdmin: false,
+        balance: 0,
+      });
+
+      // Store user info in localStorage for session (add isAdmin)
+      localStorage.setItem("user", JSON.stringify({
+        uid: userCredential.user.uid,
+        email: formData.email,
+        isAdmin: false,
+      }));
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Signup failed:", error.message);
+      alert(error.message);
+    }
   };
 
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -37,7 +84,7 @@ const Signup = () => {
           <CardTitle className="text-2xl font-bold gradient-text">Create Account</CardTitle>
           <p className="text-muted-foreground">Start your investment journey</p>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -45,7 +92,7 @@ const Signup = () => {
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
                   id="firstName"
-                  placeholder="John"
+                  placeholder="Name"
                   value={formData.firstName}
                   onChange={(e) => handleInputChange("firstName", e.target.value)}
                   required
@@ -55,26 +102,26 @@ const Signup = () => {
                 <Label htmlFor="lastName">Last Name</Label>
                 <Input
                   id="lastName"
-                  placeholder="Doe"
+                  placeholder="Last Name"
                   value={formData.lastName}
                   onChange={(e) => handleInputChange("lastName", e.target.value)}
                   required
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="john.doe@example.com"
+                placeholder="mail@example.com"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -101,7 +148,7 @@ const Signup = () => {
                 </Button>
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
@@ -113,12 +160,14 @@ const Signup = () => {
                 required
               />
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="terms"
                 checked={formData.agreeTerms}
-                onCheckedChange={(checked) => handleInputChange("agreeTerms", checked as boolean)}
+                onCheckedChange={(checked) =>
+                  handleInputChange("agreeTerms", checked as boolean)
+                }
               />
               <Label htmlFor="terms" className="text-sm">
                 I agree to the{" "}
@@ -131,17 +180,17 @@ const Signup = () => {
                 </Link>
               </Label>
             </div>
-            
-            <Button 
-              type="submit" 
-              variant="gold" 
+
+            <Button
+              type="submit"
+              variant="gold"
               className="w-full"
               disabled={!formData.agreeTerms}
             >
               Create Account
             </Button>
           </form>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}

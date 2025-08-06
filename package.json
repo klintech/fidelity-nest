@@ -9,8 +9,12 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
+<<<<<<< HEAD
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
+=======
+    "start": "vite preview"
+>>>>>>> ecc6cdf (Initial commit from new system)
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
