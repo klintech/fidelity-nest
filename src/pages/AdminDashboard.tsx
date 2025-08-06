@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDocs, updateDoc, onSnapshot } from "firebase/firestore";
+import { collection, doc, getDocs, updateDoc, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,36 @@ const AdminDashboard = () => {
     await updateDoc(userRef, { balance: newBalance });
   };
 
+  // Add funds state
+  const [addAmount, setAddAmount] = useState("");
+  const [selectedUser, setSelectedUser] = useState("");
+  const [addStatus, setAddStatus] = useState("");
+
+  const handleAddFunds = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUser || !addAmount) return;
+    try {
+      // Add deposit record (admin-initiated)
+      await addDoc(collection(db, "deposits"), {
+        userId: selectedUser,
+        amount: Number(addAmount),
+        status: "confirmed",
+        createdAt: new Date(),
+        adminAdded: true
+      });
+      // Update user balance
+      const userRef = doc(db, "users", selectedUser);
+      const user = users.find((u) => u.id === selectedUser);
+      const newBalance = (user?.balance || 0) + Number(addAmount);
+      await updateDoc(userRef, { balance: newBalance });
+      setAddStatus("Funds added!");
+      setAddAmount("");
+      setSelectedUser("");
+    } catch (err) {
+      setAddStatus("Error. Try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-hero px-4 py-8">
       <Card className="w-full max-w-3xl mb-8">
@@ -52,6 +82,34 @@ const AdminDashboard = () => {
           <CardTitle>Admin Dashboard</CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Add Funds to User */}
+          <div className="mb-8">
+            <h2 className="font-bold mb-2">Add Funds to User</h2>
+            <form onSubmit={handleAddFunds} className="flex flex-col md:flex-row gap-2 items-center">
+              <select
+                className="p-2 border rounded"
+                value={selectedUser}
+                onChange={e => setSelectedUser(e.target.value)}
+                required
+              >
+                <option value="">Select User</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.email}</option>
+                ))}
+              </select>
+              <input
+                type="number"
+                className="p-2 border rounded"
+                placeholder="Amount"
+                value={addAmount}
+                onChange={e => setAddAmount(e.target.value)}
+                min="1"
+                required
+              />
+              <Button type="submit" className="bg-crypto-gold text-white">Add Funds</Button>
+            </form>
+            {addStatus && <div className="text-muted-foreground mt-2">{addStatus}</div>}
+          </div>
           <h2 className="font-bold mb-2">Users</h2>
           <table className="w-full mb-6">
             <thead>

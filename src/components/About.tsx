@@ -58,6 +58,12 @@ const About = () => {
                   Our diverse businesses and independence give us insight into the entire market and the stability and scale needed to think and act for the long term as we deliver value to our customers and clients.
                 </p>
               </div>
+              <div>
+                <h3 className="text-2xl font-bold text-crypto-gold mb-4">Headquarters</h3>
+                <p className="text-lg leading-relaxed text-muted-foreground">
+                  Fidelity Investments headquarters is located at 245 Summer Street in Boston, Massachusetts.
+                </p>
+              </div>
             </CardContent>
           </Card>
           
