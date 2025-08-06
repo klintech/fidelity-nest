@@ -1,29 +1,47 @@
+  // Example wallet addresses
+  const bnbAddress = "0x41b4ce47e7a5add32e537882b8c28045b950bac2";
+  const trxAddress = "TJrSgRtkCU4zCTYXpeaQEGmFtjLCKSTigE";
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert("Copied to clipboard!");
+  };
+
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setWithdrawStatus("Processing...");
+    try {
+      await addDoc(collection(db, "withdrawals"), {
+        userId: user?.uid,
+        amount: Number(withdrawAmount),
+        address: withdrawAddress,
+        status: "processing",
+        createdAt: new Date()
+      });
+      setWithdrawStatus("Processing");
+      setWithdrawAmount("");
+      setWithdrawAddress("");
+    } catch (err) {
+      setWithdrawStatus("Error. Try again.");
+    }
+  };
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-<<<<<<< HEAD
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-=======
 import { collection, onSnapshot, query, where, addDoc } from "firebase/firestore";
-import { useState as useStateReact } from "react";
->>>>>>> 8e7f078 (Update About section and other changes)
 import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  // ...existing code...
   const [balance, setBalance] = useState(0);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
-<<<<<<< HEAD
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const navigate = useNavigate();
-
-=======
-
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawAddress, setWithdrawAddress] = useState("");
   const [withdrawStatus, setWithdrawStatus] = useState("");
-
   // Reinvest state
   const plans = [
     { name: "DELUXE PLAN", min: 30 },
@@ -42,7 +60,7 @@ const Dashboard = () => {
       setReinvestStatus("Invalid plan");
       return;
     }
-        if (plan.min && Number(reinvestAmount) < plan.min) {
+    if (plan.min && Number(reinvestAmount) < plan.min) {
       setReinvestStatus(`Minimum for this plan is $${plan.min}`);
       return;
     }
@@ -66,87 +84,9 @@ const Dashboard = () => {
     }
   };
 
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  const navigate = useNavigate();
-
-  const handleWithdraw = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setWithdrawStatus("Processing...");
-    try {
-      await addDoc(collection(db, "withdrawals"), {
-        userId: user?.uid,
-        amount: Number(withdrawAmount),
-        address: withdrawAddress,
-        status: "processing",
-        createdAt: new Date()
-      });
-      setWithdrawStatus("Processing");
-      setWithdrawAmount("");
-      setWithdrawAddress("");
-    } catch (err) {
-      setWithdrawStatus("Error. Try again.");
-    }
-  };
-
->>>>>>> 8e7f078 (Update About section and other changes)
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-    // Listen for user balance
-    const unsubUser = onSnapshot(collection(db, "users"), (snapshot) => {
-      const u = snapshot.docs.find((doc) => doc.id === user.uid);
-      if (u) setBalance(u.data().balance || 0);
-    });
-    // Listen for user's deposits
-    const q = query(collection(db, "deposits"), where("userId", "==", user.uid));
-    const unsubDeposits = onSnapshot(q, (snapshot) => {
-      setDeposits(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-    // Listen for user's withdrawals
-    const wq = query(collection(db, "withdrawals"), where("userId", "==", user.uid));
-    const unsubWithdrawals = onSnapshot(wq, (snapshot) => {
-      setWithdrawals(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-    return () => {
-      unsubUser();
-      unsubDeposits();
-      unsubWithdrawals();
-    };
-  }, [user, navigate]);
-
-  // Example wallet addresses
-  const bnbAddress = "0x41b4ce47e7a5add32e537882b8c28045b950bac2";
-  const trxAddress = "TJrSgRtkCU4zCTYXpeaQEGmFtjLCKSTigE";
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
-  };
-
+  // ...existing code...
   return (
     <div className="min-h-screen flex flex-col items-center bg-gradient-hero px-4 py-8">
-<<<<<<< HEAD
-      {/* Wallet Addresses Card */}
-      <Card className="w-full max-w-md mb-8">
-        <CardHeader>
-          <CardTitle>Wallet Addresses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4">
-            <div className="mb-2">
-              <span className="font-semibold">BNB:</span> <span className="font-mono text-xs">{bnbAddress}</span>
-              <Button size="sm" variant="outline" className="ml-2" onClick={() => copyToClipboard(bnbAddress)}>Copy</Button>
-            </div>
-            <div>
-              <span className="font-semibold">TRX:</span> <span className="font-mono text-xs">{trxAddress}</span>
-              <Button size="sm" variant="outline" className="ml-2" onClick={() => copyToClipboard(trxAddress)}>Copy</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-=======
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Balance Card */}
         <Card className="mb-4">
@@ -177,43 +117,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
->>>>>>> 8e7f078 (Update About section and other changes)
-      {/* ...existing code... */}
-      <Card className="w-full max-w-md mb-8">
-        <CardHeader>
-          <CardTitle>Your Balance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold mb-4">${balance}</div>
-        </CardContent>
-      </Card>
-<<<<<<< HEAD
-      <Card className="w-full max-w-md mb-8">
-        <CardHeader>
-          <CardTitle>Deposit History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {deposits.map((d: any) => (
-                <tr key={d.id}>
-                  <td>{d.amount}</td>
-                  <td>{d.status}</td>
-                  <td>{d.createdAt?.toDate?.().toLocaleString?.() || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-=======
+
+      {/* Deposit/Withdraw/History Section */}
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
         {/* Deposit History */}
         <Card>
@@ -269,6 +174,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
       {/* Reinvest Section */}
       <div className="max-w-md mx-auto mt-10">
         <div className="bg-card/50 p-6 rounded-lg shadow-lg border border-crypto-gold/20">
@@ -349,76 +255,8 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-
->>>>>>> 8e7f078 (Update About section and other changes)
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Withdrawal History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-<<<<<<< HEAD
-=======
-            {/* Withdraw Section */}
-            <div className="max-w-md mx-auto mt-10">
-                <div className="bg-card/50 p-6 rounded-lg shadow-lg border border-crypto-gold/20">
-                    <h2 className="text-2xl font-bold mb-4 text-crypto-gold">Withdraw Funds</h2>
-                    <form onSubmit={handleWithdraw} className="space-y-4">
-                        <div>
-                            <label className="block mb-1 font-semibold">Amount (USD)</label>
-                            <input
-                                type="number"
-                                className="w-full p-2 border rounded"
-                                value={withdrawAmount}
-                                onChange={e => setWithdrawAmount(e.target.value)}
-                                required
-                                min="1"
-                            />
-                        </div>
-                        <div>
-                            <label className="block mb-1 font-semibold">Wallet Address</label>
-                            <input
-                                type="text"
-                                className="w-full p-2 border rounded"
-                                value={withdrawAddress}
-                                onChange={e => setWithdrawAddress(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="w-full bg-crypto-gold text-white py-2 rounded font-bold hover:bg-yellow-600 transition"
-                        >
-                            Withdraw
-                        </button>
-                    </form>
-                    {withdrawStatus && (
-                        <div className="mt-3 text-center text-muted-foreground">{withdrawStatus}</div>
-                    )}
-                </div>
-            </div>
->>>>>>> 8e7f078 (Update About section and other changes)
-            </thead>
-            <tbody>
-              {withdrawals.map((w: any) => (
-                <tr key={w.id}>
-                  <td>{w.amount}</td>
-                  <td>{w.status}</td>
-                  <td>{w.createdAt?.toDate?.().toLocaleString?.() || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
     </div>
   );
-};
+}
 
 export default Dashboard;
