@@ -16,6 +16,18 @@ import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   // ...existing code...
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
+      const currentUser = snapshot.docs.find(doc => doc.id === user.uid);
+      if (currentUser) {
+        setBalance(currentUser.data().balance || 0);
+      }
+    });
+    return () => unsub();
+  }, [user?.uid]);
+  // ...existing code...
   const [reinvestCoin, setReinvestCoin] = useState("BNB");
   const [withdrawCoin, setWithdrawCoin] = useState("BNB");
   const [balance, setBalance] = useState(0);
