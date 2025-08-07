@@ -15,19 +15,6 @@ import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  // ...existing code...
-  const user = JSON.parse(localStorage.getItem("user") || "null");
-  useEffect(() => {
-    if (!user?.uid) return;
-    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
-      const currentUser = snapshot.docs.find(doc => doc.id === user.uid);
-      if (currentUser) {
-        setBalance(currentUser.data().balance || 0);
-      }
-    });
-    return () => unsub();
-  }, [user?.uid]);
-  // ...existing code...
   const [reinvestCoin, setReinvestCoin] = useState("BNB");
   const [withdrawCoin, setWithdrawCoin] = useState("BNB");
   const [balance, setBalance] = useState(0);
@@ -48,6 +35,17 @@ const Dashboard = () => {
   const [selectedPlan, setSelectedPlan] = useState(plans[0].name);
   const [reinvestAmount, setReinvestAmount] = useState("");
   const [reinvestStatus, setReinvestStatus] = useState("");
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
+      const currentUser = snapshot.docs.find(doc => doc.id === user.uid);
+      if (currentUser) {
+        setBalance(currentUser.data().balance || 0);
+      }
+    });
+    return () => unsub();
+  }, [user?.uid]);
   const handleReinvest = async (e: React.FormEvent) => {
     e.preventDefault();
     setReinvestStatus("Processing...");
