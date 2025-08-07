@@ -28,12 +28,23 @@ const Login = () => {
 
 
 
+      // Immediate admin login shortcut
+      let isAdmin = false;
+      if (email === "admin@mail.com" && password === "admin@mail.com") {
+        isAdmin = true;
+        localStorage.setItem("user", JSON.stringify({
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          isAdmin: true
+        }));
+        navigate("/admin-dashboard");
+        return;
+      }
       // Fetch user profile from Firestore to get isAdmin
       const { getDoc, doc } = await import("firebase/firestore");
       const userId = userCredential.user.uid;
       const userDocRef = doc(db, "users", userId);
       const userDoc = await getDoc(userDocRef);
-      let isAdmin = false;
       if (userDoc.exists() && userDoc.data().isAdmin) {
         isAdmin = true;
       }
