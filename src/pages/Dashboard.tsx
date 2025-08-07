@@ -1,30 +1,12 @@
-  // Example wallet addresses
-  const bnbAddress = "0x41b4ce47e7a5add32e537882b8c28045b950bac2";
-  const trxAddress = "TJrSgRtkCU4zCTYXpeaQEGmFtjLCKSTigE";
+// Example wallet addresses
+const bnbAddress = "0x41b4ce47e7a5add32e537882b8c28045b950bac2";
+const trxAddress = "TJrSgRtkCU4zCTYXpeaQEGmFtjLCKSTigE";
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert("Copied to clipboard!");
-  };
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text);
+  alert("Copied to clipboard!");
+};
 
-  const handleWithdraw = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setWithdrawStatus("Processing...");
-    try {
-      await addDoc(collection(db, "withdrawals"), {
-        userId: user?.uid,
-        amount: Number(withdrawAmount),
-        address: withdrawAddress,
-        status: "processing",
-        createdAt: new Date()
-      });
-      setWithdrawStatus("Processing");
-      setWithdrawAmount("");
-      setWithdrawAddress("");
-    } catch (err) {
-      setWithdrawStatus("Error. Try again.");
-    }
-  };
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   // ...existing code...
+  const [reinvestCoin, setReinvestCoin] = useState("BNB");
+  const [withdrawCoin, setWithdrawCoin] = useState("BNB");
   const [balance, setBalance] = useState(0);
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
@@ -73,14 +57,37 @@ const Dashboard = () => {
         userId: user?.uid,
         amount: Number(reinvestAmount),
         plan: selectedPlan,
+        coin: reinvestCoin,
         status: "processing",
         createdAt: new Date(),
         reinvest: true
       });
       setReinvestStatus("Reinvest request submitted!");
       setReinvestAmount("");
+      setReinvestCoin("BNB");
     } catch (err) {
       setReinvestStatus("Error. Try again.");
+    }
+  };
+
+  const handleWithdraw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setWithdrawStatus("Processing...");
+    try {
+      await addDoc(collection(db, "withdrawals"), {
+        userId: user?.uid,
+        amount: Number(withdrawAmount),
+        address: withdrawAddress,
+        coin: withdrawCoin,
+        status: "processing",
+        createdAt: new Date()
+      });
+      setWithdrawStatus("Processing");
+      setWithdrawAmount("");
+      setWithdrawAddress("");
+      setWithdrawCoin("BNB");
+    } catch (err) {
+      setWithdrawStatus("Error. Try again.");
     }
   };
 
@@ -193,6 +200,17 @@ const Dashboard = () => {
               </select>
             </div>
             <div>
+              <label className="block mb-1 font-semibold">Select Coin</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={reinvestCoin}
+                onChange={e => setReinvestCoin(e.target.value)}
+              >
+                <option value="BNB">BNB</option>
+                <option value="TRX">TRX</option>
+              </select>
+            </div>
+            <div>
               <label className="block mb-1 font-semibold">Amount (USD)</label>
               <input
                 type="number"
@@ -222,6 +240,17 @@ const Dashboard = () => {
         <div className="bg-card/50 p-6 rounded-lg shadow-lg border border-crypto-gold/20">
           <h2 className="text-2xl font-bold mb-4 text-crypto-gold">Withdraw Funds</h2>
           <form onSubmit={handleWithdraw} className="space-y-4">
+            <div>
+              <label className="block mb-1 font-semibold">Select Coin</label>
+              <select
+                className="w-full p-2 border rounded"
+                value={withdrawCoin}
+                onChange={e => setWithdrawCoin(e.target.value)}
+              >
+                <option value="BNB">BNB</option>
+                <option value="TRX">TRX</option>
+              </select>
+            </div>
             <div>
               <label className="block mb-1 font-semibold">Amount (USD)</label>
               <input

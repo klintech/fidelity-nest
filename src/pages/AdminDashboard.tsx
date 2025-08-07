@@ -132,6 +132,7 @@ const AdminDashboard = () => {
               <tr>
                 <th>User</th>
                 <th>Amount</th>
+                <th>Coin</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -141,6 +142,7 @@ const AdminDashboard = () => {
                 <tr key={deposit.id}>
                   <td>{users.find((u: any) => u.id === deposit.userId)?.email || deposit.userId}</td>
                   <td>{deposit.amount}</td>
+                  <td>{deposit.coin || '-'}</td>
                   <td>{deposit.status}</td>
                   <td>
                     <Button onClick={() => confirmDeposit(deposit)} disabled={deposit.status === "confirmed"}>
