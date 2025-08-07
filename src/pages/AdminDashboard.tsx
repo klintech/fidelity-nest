@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDocs, updateDoc, onSnapshot, addDoc } from "firebase/firestore";
+import { collection, doc, updateDoc, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FaUser, FaMoneyBillWave, FaCheckCircle, FaUsers } from "react-icons/fa";
 
 // Helper to check if current user is admin (replace with your own logic)
 const isAdmin = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
-  return user && user.isAdmin;
+  return user?.isAdmin;
 };
 
 const AdminDashboard = () => {
@@ -49,12 +50,11 @@ const AdminDashboard = () => {
   const [addAmount, setAddAmount] = useState("");
   const [selectedUser, setSelectedUser] = useState("");
   const [addStatus, setAddStatus] = useState("");
-
+  
   const handleAddFunds = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser || !addAmount) return;
     try {
-      // Add deposit record (admin-initiated)
       await addDoc(collection(db, "deposits"), {
         userId: selectedUser,
         amount: Number(addAmount),
@@ -62,7 +62,6 @@ const AdminDashboard = () => {
         createdAt: new Date(),
         adminAdded: true
       });
-      // Update user balance
       const userRef = doc(db, "users", selectedUser);
       const user = users.find((u) => u.id === selectedUser);
       const newBalance = (user?.balance || 0) + Number(addAmount);
@@ -99,7 +98,7 @@ const AdminDashboard = () => {
               </select>
               <input
                 type="number"
-                className="p-2 border rounded"
+                className="p-2 border rounded bg-white text-black focus:bg-yellow-50 focus:border-crypto-gold"
                 placeholder="Amount"
                 value={addAmount}
                 onChange={e => setAddAmount(e.target.value)}
@@ -156,6 +155,5 @@ const AdminDashboard = () => {
       </Card>
     </div>
   );
-};
-
+}
 export default AdminDashboard;

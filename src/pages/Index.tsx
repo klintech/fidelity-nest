@@ -12,6 +12,12 @@ const Index = () => {
       <About />
       <InvestmentPlans />
       <Certificate />
+      <div className="mt-8 flex justify-center">
+        <div className="bg-white/80 rounded-lg shadow p-4 border border-gray-200 max-w-xl text-center">
+          <h2 className="text-lg font-bold text-crypto-gold mb-2">Fidelity Investments Headquarters</h2>
+          <p className="text-gray-700">Location: 245 Summer Street, Boston, Massachusetts</p>
+        </div>
+      </div>
     </div>
   );
 };

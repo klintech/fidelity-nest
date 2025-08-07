@@ -226,7 +226,7 @@ const Dashboard = () => {
               <label className="block mb-1 font-semibold">Amount (USD)</label>
               <input
                 type="number"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded bg-white text-black focus:bg-yellow-50 focus:border-crypto-gold"
                 value={withdrawAmount}
                 onChange={e => setWithdrawAmount(e.target.value)}
                 required
