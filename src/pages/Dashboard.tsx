@@ -276,7 +276,7 @@ const Dashboard = () => {
               <label className="block mb-1 font-semibold">Wallet Address</label>
               <input
                 type="text"
-                className="w-full p-2 border rounded"
+                className="w-full p-2 border rounded bg-white text-black focus:bg-yellow-50 focus:border-crypto-gold"
                 value={withdrawAddress}
                 onChange={e => setWithdrawAddress(e.target.value)}
                 required
