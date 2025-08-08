@@ -5,9 +5,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // 👇 Important for production build to work correctly on your custom domain
-  base: '/',
-  
+  base: './', // ✅ Fixes MIME type issues on custom domains
+
   server: {
     host: "::",
     port: 8080,
